@@ -1,0 +1,5 @@
+# depslib dependency file v1.0
+1486788661 source:/home/izart/git/LearnSdl/TestSDL/firstDemo.cpp
+	<SDL2/SDL.h>
+	<stdio.h>
+

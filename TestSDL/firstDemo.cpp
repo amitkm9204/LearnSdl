@@ -9,7 +9,11 @@ typedef struct
     short life;
     char *name;
 }Man;
-void do_render(SDL_Renderer *renderer,Man *man)
+typedef struct
+{
+    Man man;
+}GameState;
+void do_render(SDL_Renderer *renderer,GameState *game)
 {
      SDL_SetRenderDrawColor(renderer,0,0,255,255);
 
@@ -19,13 +23,13 @@ void do_render(SDL_Renderer *renderer,Man *man)
     //set the drawing color to white...
     SDL_SetRenderDrawColor(renderer,255,255,255,255);
 
-    SDL_Rect rect = {man->x,man->y,20,20};
+    SDL_Rect rect = {game->man.x,game->man.y,20,20};
     SDL_RenderFillRect(renderer,&rect);
 
     //We are done drawing "present" or slow
     SDL_RenderPresent(renderer);
 }
-int eventProcess(SDL_Window *window,Man *man)
+int eventProcess(SDL_Window *window,GameState *game)
 {
     int done=0;
      SDL_Event event;
@@ -50,18 +54,6 @@ int eventProcess(SDL_Window *window,Man *man)
                 case SDLK_ESCAPE :
                     done = 1;
                     break;
-                case SDLK_RIGHT:
-                    man->x+=10;
-                    break;
-                case SDLK_LEFT:
-                    man->x -= 10;
-                    break;
-                case SDLK_DOWN:
-                    man->y+=10;
-                    break;
-                case SDLK_UP:
-                    man->y-=10;
-                    break;
                 }
             }
             break;
@@ -72,25 +64,40 @@ int eventProcess(SDL_Window *window,Man *man)
 
          }
      }
-    /*const Unit8 *state =  SDL_GetKeyboardState(NULL);
-    if(state[SDL_SCANCODE_RETURN])
+
+    const Uint8 *state = SDL_GetKeyboardState(NULL);
+
+    if(state[SDL_SCANCODE_LEFT])
     {
-        printf("<RETURN> is pressed .\n");
-    }*/
+        game->man.x -= 10;
+    }
+    if(state[SDL_SCANCODE_RIGHT])
+    {
+        game->man.x += 10;
+    }
+    if(state[SDL_SCANCODE_UP])
+    {
+        game->man.y -= 10;
+    }
+    if(state[SDL_SCANCODE_DOWN])
+    {
+        game->man.y += 10;
+    }
+
      return done;
 }
 int main(int argc,char *argv[])
 {
 
-    SDL_Window *window;
-    SDL_Renderer *renderer;
+    GameState gameState;
+    SDL_Window *window = NULL;
+    SDL_Renderer *renderer = NULL;
 
     SDL_Init(SDL_INIT_VIDEO);
 
 
-    Man man;
-    man.x = 220;
-    man.y = 140;
+    gameState.man.x = 320-40;
+    gameState.man.y = 240-40;
 
 
 window = SDL_CreateWindow("Test Demo",100,100,640,480,0);
@@ -105,10 +112,10 @@ int done = 0;
  while(!done)
  {
 
-    done = eventProcess(window,&man);
+    done = eventProcess(window,&gameState);
      //check for events
 
-    do_render(renderer,&man);
+    do_render(renderer,&gameState);
 
     //wait a few seconds before quiting
     SDL_Delay(10);
